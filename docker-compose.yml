@@ -1,0 +1,51 @@
+version: "3"
+services:
+  absen:
+    image: mariadb
+    container_name: absensi-mariadb
+
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_520_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: Bima310523!!
+      TZ: Asia/Jakarta
+    ports:
+      - 3334:3306
+    networks:
+      - absensi
+
+  web:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: absensi-php-apache:1.0
+    container_name: absensi-php-apache
+
+    depends_on:
+      - absen
+    environment:
+      TZ: Asia/Jakarta
+    volumes:
+      - ./vhost.conf:/etc/apache2/sites-available/000-default.conf
+      - ./xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      - .:/var/www/html
+    ports:
+      - 3335:80
+    networks:
+      - absensi
+
+  phpmyadmin:
+    container_name: absensi-phpmyadmin
+    image: phpmyadmin
+    environment:
+      MYSQL_ROOT_PASSWORD: Bima310523!!
+      PMA_HOST: absen
+      TZ: Asia/Jakarta
+    depends_on:
+      - absen
+    ports:
+      - 3336:80
+    networks:
+      - absensi
+
+networks:
+  absensi:
